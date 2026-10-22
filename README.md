@@ -28,12 +28,6 @@ PostgreSQL persistence, migrations, idempotency, and concurrency control are cov
 
 ## Roadmap
 
-### Day 1 — Domain and first API
-
-- Implement in-memory wallet and transfer rules.
-- Expose the initial HTTP endpoints, DTOs, validation, and centralized error handling.
-- Cover valid transfers and the main business-rule failures with tests.
-
 ### Day 2 — Persistence and consistency
 
 - Persist wallets and transfers in PostgreSQL with JPA and Flyway migrations.
