@@ -13,7 +13,6 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@Service
 public class WalletServiceTest {
     private final static UUID WALLET_UUID = UUID.fromString("11111111-1111-1111-1111-111111111111");
     private final static BigDecimal WALLET_AMOUNT = new BigDecimal("100.00");
