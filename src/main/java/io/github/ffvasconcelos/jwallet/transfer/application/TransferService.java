@@ -10,7 +10,6 @@ import io.github.ffvasconcelos.jwallet.wallet.domain.WalletNotFoundException;
 import io.github.ffvasconcelos.jwallet.wallet.domain.WalletRepository;
 import org.springframework.stereotype.Service;
 
-import java.time.Instant;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -38,11 +37,10 @@ public class TransferService {
 
         return new Transfer(
                 UUID.randomUUID(),
-                sourceWallet.id(),
-                targetWallet.id(),
+                sourceWallet,
+                targetWallet,
                 command.amount(),
-                TransferStatus.COMPLETED,
-                Instant.now()
+                TransferStatus.COMPLETED
         );
     }
 

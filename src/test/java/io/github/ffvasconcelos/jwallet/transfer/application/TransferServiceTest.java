@@ -4,6 +4,7 @@ import io.github.ffvasconcelos.jwallet.transfer.domain.InsufficientBalanceExcept
 import io.github.ffvasconcelos.jwallet.transfer.domain.InvalidTransferAmountException;
 import io.github.ffvasconcelos.jwallet.transfer.domain.SameWalletTransferException;
 import io.github.ffvasconcelos.jwallet.transfer.domain.Transfer;
+import io.github.ffvasconcelos.jwallet.transfer.domain.TransferStatus;
 import io.github.ffvasconcelos.jwallet.wallet.domain.Wallet;
 import io.github.ffvasconcelos.jwallet.wallet.infrastructure.InMemoryWalletRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -13,6 +14,8 @@ import java.math.BigDecimal;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class TransferServiceTest {
@@ -39,6 +42,10 @@ class TransferServiceTest {
                 new BigDecimal("25.50")
         ));
 
+        assertNotNull(transfer.id());
+        assertEquals(TransferStatus.COMPLETED, transfer.status());
+        // CreationTimestamp is populated by Hibernate, which is absent in this unit test.
+        assertNull(transfer.createdAt());
         assertEquals(SOURCE_WALLET_ID, transfer.sourceWalletId());
         assertEquals(TARGET_WALLET_ID, transfer.targetWalletId());
         assertEquals(new BigDecimal("25.50"), transfer.amount());
