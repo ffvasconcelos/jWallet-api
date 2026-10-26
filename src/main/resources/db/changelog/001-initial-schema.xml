@@ -1,0 +1,61 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+    <changeSet author="jwallet" id="1793046202658-1">
+        <createTable tableName="transfers">
+            <column name="id" type="UUID">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="transfersPK"/>
+            </column>
+            <column name="amount" type="numeric(19, 2)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP(6) WITH TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status" type="VARCHAR(20)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="source_wallet_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+            <column name="target_wallet_id" type="UUID">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="jwallet" id="1793046202658-2">
+        <createTable tableName="wallets">
+            <column name="id" type="UUID">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="walletsPK"/>
+            </column>
+            <column name="balance" type="numeric(19, 2)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP(6) WITH TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="TIMESTAMP(6) WITH TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="jwallet" id="1793046202658-3">
+        <createIndex indexName="idx_transfers_source_history" tableName="transfers">
+            <column name="source_wallet_id"/>
+            <column descending="true" name="created_at"/>
+            <column descending="true" name="id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jwallet" id="1793046202658-4">
+        <createIndex indexName="idx_transfers_target_history" tableName="transfers">
+            <column name="target_wallet_id"/>
+            <column descending="true" name="created_at"/>
+            <column descending="true" name="id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="jwallet" id="1793046202658-5">
+        <addForeignKeyConstraint baseColumnNames="source_wallet_id" baseTableName="transfers" constraintName="fk_transfers_source_wallet" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="wallets" validate="true"/>
+    </changeSet>
+    <changeSet author="jwallet" id="1793046202658-6">
+        <addForeignKeyConstraint baseColumnNames="target_wallet_id" baseTableName="transfers" constraintName="fk_transfers_target_wallet" deferrable="false" initiallyDeferred="false" referencedColumnNames="id" referencedTableName="wallets" validate="true"/>
+    </changeSet>
+</databaseChangeLog>
