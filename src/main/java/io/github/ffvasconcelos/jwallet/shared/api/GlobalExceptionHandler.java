@@ -3,6 +3,7 @@ package io.github.ffvasconcelos.jwallet.shared.api;
 import io.github.ffvasconcelos.jwallet.transfer.domain.InsufficientBalanceException;
 import io.github.ffvasconcelos.jwallet.transfer.domain.InvalidTransferAmountException;
 import io.github.ffvasconcelos.jwallet.transfer.domain.SameWalletTransferException;
+import io.github.ffvasconcelos.jwallet.transfer.domain.TransferNotFoundException;
 import io.github.ffvasconcelos.jwallet.wallet.domain.WalletNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
@@ -20,6 +21,11 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(WalletNotFoundException.class)
     public ResponseEntity<ProblemDetail> handleWalletNotFound(WalletNotFoundException exception) {
+        return problem(HttpStatus.NOT_FOUND, exception.getMessage());
+    }
+
+    @ExceptionHandler(TransferNotFoundException.class)
+    public ResponseEntity<ProblemDetail> handleTransferNotFound(TransferNotFoundException exception) {
         return problem(HttpStatus.NOT_FOUND, exception.getMessage());
     }
 

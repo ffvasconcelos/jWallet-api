@@ -20,8 +20,13 @@ public class DemoWalletDataConfiguration {
     @Bean
     CommandLineRunner loadDemoWallets(WalletRepository walletRepository) {
         return arguments -> {
-            walletRepository.save(new Wallet(SOURCE_WALLET_ID, new BigDecimal("1000.00")));
-            walletRepository.save(new Wallet(TARGET_WALLET_ID, new BigDecimal("250.00")));
+            if (walletRepository.findById(SOURCE_WALLET_ID).isEmpty()) {
+                walletRepository.save(new Wallet(SOURCE_WALLET_ID, new BigDecimal("1000.00")));
+            }
+
+            if (walletRepository.findById(TARGET_WALLET_ID).isEmpty()) {
+                walletRepository.save(new Wallet(TARGET_WALLET_ID, new BigDecimal("250.00")));
+            }
         };
     }
 }

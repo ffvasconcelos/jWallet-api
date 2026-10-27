@@ -8,4 +8,6 @@ public interface WalletRepository {
     Optional<Wallet> findById(UUID walletId);
 
     Wallet save(Wallet wallet);
+
+    Iterable<Wallet> findAll();
 }

@@ -1,13 +1,10 @@
 package io.github.ffvasconcelos.jwallet.transfer.application;
 
-import io.github.ffvasconcelos.jwallet.transfer.domain.InsufficientBalanceException;
-import io.github.ffvasconcelos.jwallet.transfer.domain.InvalidTransferAmountException;
-import io.github.ffvasconcelos.jwallet.transfer.domain.SameWalletTransferException;
-import io.github.ffvasconcelos.jwallet.transfer.domain.Transfer;
-import io.github.ffvasconcelos.jwallet.transfer.domain.TransferStatus;
+import io.github.ffvasconcelos.jwallet.transfer.domain.*;
 import io.github.ffvasconcelos.jwallet.wallet.domain.Wallet;
 import io.github.ffvasconcelos.jwallet.wallet.domain.WalletNotFoundException;
 import io.github.ffvasconcelos.jwallet.wallet.domain.WalletRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.util.Objects;
@@ -17,11 +14,14 @@ import java.util.UUID;
 public class TransferService {
 
     private final WalletRepository walletRepository;
+    private final TransferRepository transferRepository;
 
-    public TransferService(WalletRepository walletRepository) {
+    public TransferService(WalletRepository walletRepository,  TransferRepository transferRepository) {
         this.walletRepository = walletRepository;
+        this.transferRepository = transferRepository;
     }
 
+    @Transactional
     public Transfer transfer(TransferCommand command) {
         validate(command);
 
@@ -35,13 +35,20 @@ public class TransferService {
         sourceWallet.debit(command.amount());
         targetWallet.credit(command.amount());
 
-        return new Transfer(
+        Transfer transfer = new Transfer(
                 UUID.randomUUID(),
                 sourceWallet,
                 targetWallet,
                 command.amount(),
                 TransferStatus.COMPLETED
         );
+
+        return transferRepository.save(transfer);
+    }
+
+    public Transfer findTransfer(UUID transferId) {
+        return transferRepository.findById(transferId)
+                .orElseThrow(() -> new TransferNotFoundException(transferId));
     }
 
     private void validate(TransferCommand command) {
