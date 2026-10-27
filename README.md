@@ -26,8 +26,10 @@ PostgreSQL connectivity, Liquibase migrations, JPA repositories, and transaction
 
 | Method | Path | Successful response |
 |---|---|---|
+| GET | `/wallets` | `200 OK`, array of wallet DTOs |
 | POST | `/wallets` | `201 Created`, wallet JSON and `Location: /wallets/{id}` |
 | GET | `/wallets/{id}` | `200 OK`, wallet JSON |
+| GET | `/transfers` | `200 OK`, array of transfer DTOs |
 | POST | `/transfers` | `201 Created`, transfer JSON and `Location: /transfers/{id}` |
 | GET | `/transfers/{id}` | `200 OK`, transfer JSON |
 
@@ -55,7 +57,18 @@ The transfer response contains `id`, `sourceWalletId`, `targetWalletId`, `amount
 `status`, and `createdAt`. A missing transfer returns `404` with ProblemDetail;
 a malformed UUID returns `400`. Wallet associations are fetched for transfer
 lookup so response mapping works with Open EntityManager in View disabled.
-Wallet history pagination is still pending.
+List wallets or transfers:
+
+```bash
+curl -i http://localhost:8080/wallets
+curl -i http://localhost:8080/transfers
+```
+
+Collection responses are JSON arrays of the same DTOs used by individual GETs;
+empty collections return `[]` with `200`. Both listings currently return all
+records without pagination or a guaranteed order. Transfer listing fetches the
+source and target wallets using EntityGraph so mapping works after the repository
+session closes. Wallet history pagination is still pending.
 
 ## Business rules
 

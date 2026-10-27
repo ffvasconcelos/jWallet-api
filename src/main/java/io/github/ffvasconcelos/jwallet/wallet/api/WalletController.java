@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.UUID;
+import java.util.List;
+import java.util.ArrayList;
 import java.net.URI;
 
 @RestController
@@ -36,5 +38,13 @@ public class WalletController {
         Wallet wallet = walletService.getWalletById(id);
 
         return ResponseEntity.ok().body(new WalletResponse(wallet.id(), wallet.balance()));
+    }
+
+    @GetMapping
+    public ResponseEntity<List<WalletResponse>> listWallets() {
+        List<WalletResponse> response = new ArrayList<>();
+        walletService.getWallets().forEach(wallet ->
+                response.add(new WalletResponse(wallet.id(), wallet.balance())));
+        return ResponseEntity.ok(response);
     }
 }

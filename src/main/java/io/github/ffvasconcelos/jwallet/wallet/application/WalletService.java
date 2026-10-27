@@ -29,4 +29,9 @@ public class WalletService {
         Wallet wallet = new Wallet(id, amount);
         return this.walletRepository.save(wallet);
     }
+
+    @Transactional
+    public Iterable<Wallet> getWallets() {
+        return this.walletRepository.findAll();
+    }
 }

@@ -46,6 +46,10 @@ public class TransferService {
         return transferRepository.save(transfer);
     }
 
+    public Iterable<Transfer> getTransfers() {
+        return transferRepository.findAll();
+    }
+
     public Transfer findTransfer(UUID transferId) {
         return transferRepository.findById(transferId)
                 .orElseThrow(() -> new TransferNotFoundException(transferId));

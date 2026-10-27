@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.net.URI;
 import java.util.UUID;
+import java.util.List;
+import java.util.ArrayList;
 
 @RestController
 @RequestMapping("/transfers")
@@ -22,6 +24,13 @@ public class TransferController {
 
     public TransferController(TransferService transferService) {
         this.transferService = transferService;
+    }
+
+    @GetMapping
+    public ResponseEntity<List<TransferResponse>> listTransfers() {
+        List<TransferResponse> response = new ArrayList<>();
+        transferService.getTransfers().forEach(transfer -> response.add(toResponse(transfer)));
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/{id}")

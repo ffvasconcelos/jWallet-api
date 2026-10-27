@@ -16,6 +16,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
+import static org.hamcrest.Matchers.hasItem;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -121,6 +122,49 @@ class WalletAndTransferRoutesTest {
     @Test
     void rejectsMalformedTransferId() throws Exception {
         mvc.perform(get("/transfers/not-a-uuid")).andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void listsWalletsUsingResponseDtos() throws Exception {
+        UUID firstId = createWallet("100.00");
+        UUID secondId = createWallet("0.00");
+
+        mvc.perform(get("/wallets"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$[*].id").value(hasItem(firstId.toString())))
+                .andExpect(jsonPath("$[*].id").value(hasItem(secondId.toString())))
+                .andExpect(jsonPath("$[?(@.id == '%s')].balance", firstId).value(hasItem(100.0)))
+                .andExpect(jsonPath("$[?(@.id == '%s')].balance", secondId).value(hasItem(0.0)));
+    }
+
+    @Test
+    void listsTransfersWithWalletIdsOutsidePersistenceSession() throws Exception {
+        UUID sourceId = createWallet("100.00");
+        UUID targetId = createWallet("20.00");
+        MvcResult created = mvc.perform(post("/transfers").contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {"sourceWalletId":"%s","targetWalletId":"%s","amount":25.50}
+                                """.formatted(sourceId, targetId)))
+                .andExpect(status().isCreated()).andReturn();
+        String location = created.getResponse().getHeader("Location");
+        assertNotNull(location);
+        String transferId = location.substring("/transfers/".length());
+
+        mvc.perform(get("/transfers"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$[?(@.id == '%s')].sourceWalletId", transferId)
+                        .value(hasItem(sourceId.toString())))
+                .andExpect(jsonPath("$[?(@.id == '%s')].targetWalletId", transferId)
+                        .value(hasItem(targetId.toString())))
+                .andExpect(jsonPath("$[?(@.id == '%s')].amount", transferId).value(hasItem(25.50)))
+                .andExpect(jsonPath("$[?(@.id == '%s')].status", transferId).value(hasItem("COMPLETED")))
+                .andExpect(jsonPath("$[?(@.id == '%s')].createdAt", transferId).isNotEmpty())
+                .andExpect(jsonPath("$[*].sourceWallet").isEmpty())
+                .andExpect(jsonPath("$[*].targetWallet").isEmpty());
     }
 
     private UUID createWallet(String balance) {
